@@ -1,6 +1,9 @@
 import tensorflow as tf
 from tensorflow import keras
+import sklearn
 import numpy as np
+
+# Approaches: Deep Learning, Broker Fees, Discrete Fourier Transformation
 
 
 def formatData(datasetPath):
@@ -14,6 +17,9 @@ def main(dataset):
         print("Did not register a dataset")
         return
     print(f"Evaluating dataset with the length {len(dataset)}")
+    print(dataset[0])
+    print(dataset[1])
+    print(dataset[len(dataset)-1])
 
 
 if __name__ == '__main__':
