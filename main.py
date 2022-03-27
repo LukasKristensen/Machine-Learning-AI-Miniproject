@@ -1,6 +1,8 @@
 import tensorflow as tf
 from tensorflow import keras
-import sklearn
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 import numpy as np
 
 # Approaches: Deep Learning, Broker Fees, Discrete Fourier Transformation
