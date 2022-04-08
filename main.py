@@ -23,8 +23,16 @@ def main(dataset):
     print(dataset[1])
     print(dataset[len(dataset)-1])
 
+def kmeansclustering(dataset):
+    print("Clustering Dataset:",dataset)
+
+
 
 if __name__ == '__main__':
     nasdaq71_22 = 'data-set/^IXIC 1971-2022.csv'
     datasetFormatted = formatData(nasdaq71_22)
     main(datasetFormatted)
+
+
+    clusterDataset = formatData('data-set/stockMarketData.csv')
+    kmeansclustering(clusterDataset)
