@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.cluster.vq import kmeans,vq
 
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -25,28 +26,52 @@ def regression(dataset):
     print(dataset[-1])
 
 def kmeansclustering(datasetPath):
-    print("Clustering Dataset:",datasetPath)
+    """"
+    The clustering structure is based on the code from:
+    https://pythonforfinance.net/2018/02/08/stock-clusters-using-k-means-algorithm-in-python/
+    """
 
-    pureStock = {'TICK':['MSFT','AAPL','BABA','NVDA'],
-                 '5YAVG':[85.71,89.02,0.03,128.06],
-                 'BETA':[0.91,1.19,0.89,1.42]}
+    ticker = ['MSFT', 'AAPL', 'BABA', 'NVDA', 'PINS', 'ZM', 'SHOP', 'PYPL', 'MA', 'ADBE', 'TSLA']
+    Y5AVG = [85.71,89.02,0.03,128.06,0.01,0.08,31.32,43.6,57.33,62.79,300.59]
+    BETA = [0.91,1.19,0.89,1.42,1.19,-0.94,1.62,1.29,1.08,1.05,2.08]
 
-    stockData = pd.read_csv(datasetPath,index_col=0)
-    stockDataFrame = pd.DataFrame(pureStock)
+    stockDataFrame = pd.DataFrame(Y5AVG)
+    stockDataFrame.columns = ['Y5AVG']
+    stockDataFrame['BETA'] = BETA
+
+    data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA'])]).T
+    dataCopy = data
+
     print(stockDataFrame.head())
 
-
     frameInertia = []
-    for k in range(2, 4):
+    for k in range(2, 6):
         kMeans = KMeans(n_clusters=k)
-        kMeans.fit(stockDataFrame)
+        kMeans.fit(dataCopy)
         frameInertia.append(kMeans.inertia_)
 
-    figureInertia = plt.figure(figusize=(10,5))
-    plt.plot(range(2,4), frameInertia)
+    plt.plot(range(2,6), frameInertia)
     plt.grid(True)
     plt.show()
 
+    stockCentroids,_ = kmeans(data, 4)
+    assignedStock,_ = vq(data, stockCentroids)
+
+    kmeanPlot = plt
+    kmeanPlot.plot(data[assignedStock==0,0], data[assignedStock==0,1], 'ob',
+                   data[assignedStock==1,0], data[assignedStock==1,1], 'oy',
+                   data[assignedStock==2,0], data[assignedStock==2,1], 'og',
+                   data[assignedStock==3,0], data[assignedStock==3,1], 'or')
+
+    kmeanPlot.plot(stockCentroids[:,0], stockCentroids[:,1],'sg',markersize=10, alpha=0.1)
+    kmeanPlot.ylabel = ('testing')
+
+    for i in range(len(assignedStock)):
+        print(assignedStock[i], ticker[i])
+
+    kmeanPlot.show()
+    plt.show()
+    print("View:","\n", stockDataFrame,assignedStock)
 
 
 
