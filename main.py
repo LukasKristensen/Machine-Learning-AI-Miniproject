@@ -29,24 +29,20 @@ def kmeansclustering(stocksCSV):
     https://pythonforfinance.net/2018/02/08/stock-clusters-using-k-means-algorithm-in-python/
     """
 
-    print("Printing header for StocksCSV:")
-    print(stocksCSV.head())
     ticker = stocksCSV['Ticker']
     Y5AVG = stocksCSV['5YAvgReturn']
     BETA = stocksCSV['Beta']
     PE = stocksCSV['PE']
-
-    print(len(Y5AVG),len(BETA),len(PE))
 
     stockDataFrame = pd.DataFrame(Y5AVG)
     stockDataFrame.columns = ['Y5AVG']
     stockDataFrame['BETA'] = BETA
     stockDataFrame['PE'] = PE
 
-    data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA']), np.asarray(stockDataFrame['PE'])]).T
+    data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA']),np.asarray(stockDataFrame['PE'])]).T
     dataCopy = data
 
-    print(stockDataFrame.head())
+    print(stocksCSV.head())
 
     frameInertia = []
     for k in range(2, 6):
@@ -58,22 +54,25 @@ def kmeansclustering(stocksCSV):
     plt.grid(True)
     plt.show()
 
-    stockCentroids,_ = kmeans(data, 4)
+    stockCentroids,_ = kmeans(data, 3)
     assignedStock,_ = vq(data, stockCentroids)
 
-    kmeanPlot = plt
-    kmeanPlot.plot(data[assignedStock==0,0], data[assignedStock==0,1], 'ob',
-                   data[assignedStock==1,0], data[assignedStock==1,1], 'oy',
-                   data[assignedStock==2,0], data[assignedStock==2,1], 'og',
-                   data[assignedStock==3,0], data[assignedStock==3,1], 'or')
-
-    kmeanPlot.plot(stockCentroids[:,0], stockCentroids[:,1],'sg',markersize=10, alpha=0.1)
+    fig3d = plt.figure(figsize=(15,15))
+    axes = fig3d.add_subplot(111, projection='3d')
+    axes.scatter(data[assignedStock==0,0], data[assignedStock==0,1],data[assignedStock==0,2], s=20, c='blue',label="Cluster 0")
+    axes.scatter(data[assignedStock==1,0], data[assignedStock==1,1],data[assignedStock==1,2], s=20, c='green',label="Cluster 1")
+    axes.scatter(data[assignedStock==2,0], data[assignedStock==2,1],data[assignedStock==2,2], s=20, c='red',label="Cluster 2")
+    axes.scatter(data[assignedStock==3,0], data[assignedStock==3,1],data[assignedStock==3,2], s=20, c='yellow',label="Cluster 3")
+    axes.set_xlabel('5YAvgReturn')
+    axes.set_ylabel('Beta')
+    axes.set_zlabel('PE')
+    plt.show()
 
     for i in range(len(assignedStock)):
         print(assignedStock[i], ticker[i])
 
-    kmeanPlot.show()
-    plt.show()
+    """kmeanPlot.show()
+    plt.show()"""
     print("View:","\n", stockDataFrame,assignedStock)
 
 
