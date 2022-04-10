@@ -21,20 +21,20 @@ def regression(dataset):
         print("Did not register a dataset")
         return
     print(f"Evaluating dataset with the length {len(dataset)}")
-    print(dataset[0])
-    print(dataset[1])
-    print(dataset[-1])
+    print(dataset)
 
-def kmeansclustering(datasetPath):
+def kmeansclustering(stocksCSV):
     """
-    The clustering structure is based on the code from:
+    The clustering code structure is based on the code from:
     https://pythonforfinance.net/2018/02/08/stock-clusters-using-k-means-algorithm-in-python/
     """
 
-    ticker = ['MSFT', 'AAPL', 'BABA', 'NVDA', 'PINS', 'ZM', 'SHOP', 'PYPL', 'MA', 'ADBE', 'TSLA']
-    Y5AVG = [85.71,89.02,0.03,128.06,0.01,0.08,31.32,43.6,57.33,62.79]
-    BETA = [0.91,1.19,0.89,1.42,1.19,-0.94,1.62,1.29,1.08,1.05]
-    PE = [31.61,28.28,27.54,60.05,51.2,24.97,26.33,31.59,40.21,44.23]
+    print("Printing header for StocksCSV:")
+    print(stocksCSV.head())
+    ticker = stocksCSV['Ticker']
+    Y5AVG = stocksCSV['5YAvgReturn']
+    BETA = stocksCSV['Beta']
+    PE = stocksCSV['PE']
 
     print(len(Y5AVG),len(BETA),len(PE))
 
@@ -77,10 +77,17 @@ def kmeansclustering(datasetPath):
     print("View:","\n", stockDataFrame,assignedStock)
 
 
-
 if __name__ == '__main__':
     nasdaq71_22 = 'data-set/^IXIC 1971-2022.csv'
     datasetFormatted = formatData(nasdaq71_22)
-    regression(datasetFormatted)
 
-    kmeansclustering('data-set/testingData.csv')
+    filepathNasdaq = (open('data-set/^IXIC 1971-2022.csv'))
+    nasdaqCSV = pd.read_csv(filepathNasdaq)
+
+    filepathStocks = (open('data-set/testDataV3.csv'))
+    stocksCSV = pd.read_csv(filepathStocks, sep=';')
+
+    regression(nasdaqCSV)
+
+    # kmeansclustering('data-set/testingData.csv')
+    kmeansclustering(stocksCSV)
