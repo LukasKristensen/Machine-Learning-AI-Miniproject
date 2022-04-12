@@ -12,6 +12,13 @@ from sklearn.cluster import KMeans
 
 
 def regression(dataset):
+    """
+    Interesting ways to implementing regression:
+    - Support Vector Machine (Should be the first on to try out)
+    - Convolutional Neural Network
+    - Recurrent Neural Network
+    """
+
     if dataset is None:
         print("Did not register a dataset")
         return
@@ -38,7 +45,7 @@ def kmeansclustering(stocksCSV):
     data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA']),np.asarray(stockDataFrame['PE'])]).T
     dataCopy = data
 
-    numberOfClusters = 3
+    numberOfClusters = 4
 
     frameInertia = []
     for k in range(1, numberOfClusters+1):
@@ -80,5 +87,5 @@ if __name__ == '__main__':
     regression(nasdaqCSV)
 
     filepathStocks = (open('data-set/testDataV3.csv'))
-    stocksCSV = pd.read_csv(filepathStocks, sep=';')
-    kmeansclustering(stocksCSV)
+    stocksToCSV = pd.read_csv(filepathStocks, sep=';')
+    kmeansclustering(stocksToCSV)
