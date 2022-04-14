@@ -1,8 +1,4 @@
-import tensorflow as tf
-from tensorflow import keras
-from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.cluster.vq import kmeans,vq
@@ -10,6 +6,8 @@ from scipy.cluster.vq import kmeans,vq
 import pandas as pd
 from sklearn.cluster import KMeans
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVR
 
 def regression(dataset):
     """
@@ -17,6 +15,10 @@ def regression(dataset):
     - Support Vector Machine (Should be the first on to try out)
     - Convolutional Neural Network
     - Recurrent Neural Network
+
+    Material for implementing:
+    - https://www.analyticsvidhya.com/blog/2020/03/support-vector-regression-tutorial-for-machine-learning/
+    - https://medium.com/pursuitnotes/support-vector-regression-in-6-steps-with-python-c4569acd062d
     """
 
     if dataset is None:
@@ -36,7 +38,7 @@ def kmeansclustering(stocksCSV):
     BETA = stocksCSV['Beta']
     PE = stocksCSV['PE']
 
-    stockDataFrame = pd.DataFrame(Y5AVG)
+    stockDataFrame = pd.DataFrame()
     stockDataFrame['Y5AVG'] = Y5AVG
     stockDataFrame['BETA'] = BETA
     stockDataFrame['PE'] = PE
