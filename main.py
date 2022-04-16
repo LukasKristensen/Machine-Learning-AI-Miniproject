@@ -24,8 +24,17 @@ def regression(dataset):
     if dataset is None:
         print("Did not register a dataset")
         return
+
+    nasdaqDF = pd.DataFrame()
+    nasdaqDF['Open'] = dataset['Open']
+
+
     print(f"Evaluating dataset with the length {len(dataset)}")
     print(dataset)
+    plt.plot(dataset['Date'], dataset['Open'])
+    plt.xticks(range(0,len(dataset['Date']),1000))
+    plt.show()
+
 
 def kmeansclustering(stocksCSV):
     """
