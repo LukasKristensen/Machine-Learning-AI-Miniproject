@@ -1,14 +1,15 @@
 from sklearn.model_selection import train_test_split
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.cluster.vq import kmeans,vq
-
 import pandas as pd
-from sklearn.cluster import KMeans
+
+from scipy.cluster.vq import kmeans,vq
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from sklearn.metrics import accuracy_score
+
+# Todo: Comment code before hand-in
 
 def regression(dataset):
     """
@@ -72,10 +73,10 @@ def kmeansclustering(stocksCSV):
     plt.grid(True)
     plt.show()
 
-    stockCentroids,inertia = kmeans(data, numberOfClusters)
-    print("Euclidean distance:",inertia)
-    assignedStock,iner = vq(data, stockCentroids)
-    print("For-each data-point - Euclidean distance to cluster:",iner)
+    stockCentroids,euclidean = kmeans(data, numberOfClusters)
+    print("Euclidean distance:",euclidean)
+    assignedStock, innerEuclidean = vq(data, stockCentroids)
+    print("For-each data-point - Euclidean distance to cluster:",innerEuclidean)
 
     for i in range(len(assignedStock)):
         print(assignedStock[i], ticker[i])
