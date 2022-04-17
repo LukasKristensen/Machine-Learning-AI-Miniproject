@@ -102,21 +102,27 @@ def regression(dataset):
     plt.title("Nasdaq Composite 1971-2022")
     plt.show()
 
-    trainingData = nasdaqDF[-500:-100]
+    trainingData = nasdaqDF[-1000:-100]
+    testData = nasdaqDF[-100:]
 
-    print("TrainingData:",trainingData)
+    xreshaped = np.array(trainingData['Open'][:-10]).reshape((-1, 1))
+    yreshaped = trainingData['Open'].shift(-10)[:-10]
 
-    # testData = nasdaqDF[-100:]
+    xtestData = np.array(testData['Open'][:-10]).reshape((-1, 1))
+    ytestData = testData['Open'].shift(-10)[:-10]
 
-    reshaped = np.array(trainingData['Open']).reshape((-1, 1))
+    plt.plot(xreshaped, yreshaped)
 
-    # reshaped = np.reshape(trainingData['Open'], newshape=(-1, 1))
-    # print("Reshaped:",reshaped)
+    print("x_Reshaped:",xreshaped)
+    print("y_Reshaped.",yreshaped)
+    print("Debugging ...")
 
-    svrClass = SVR(kernel='rbf').fit(reshaped, trainingData['Open'])
-    print("Reshaped:",reshaped)
-    testPredict = svrClass.predict([[7957.930176]])
+    # Check parameters: C and gamma
+    svrClass = SVR(kernel='rbf').fit(xreshaped, yreshaped)
+    testPredict = svrClass.predict([[13200]])
     print("Done SVC",testPredict)
+    print("Score: ",svrClass.score(xtestData,ytestData))
+    plt.show()
 
 
 if __name__ == '__main__':
