@@ -11,35 +11,6 @@ from sklearn.metrics import accuracy_score
 
 # Todo: Comment code before hand-in
 
-def regression(dataset):
-    """
-    Interesting ways to implementing regression:
-    - Support Vector Machine (Should be the first on to try out)
-    - Convolutional Neural Network
-    - Recurrent Neural Network
-
-    Material for implementing:
-    - https://www.analyticsvidhya.com/blog/2020/03/support-vector-regression-tutorial-for-machine-learning/
-    - https://medium.com/pursuitnotes/support-vector-regression-in-6-steps-with-python-c4569acd062d
-    - https://www.geeksforgeeks.org/predicting-stock-price-direction-using-support-vector-machines/?ref=rp
-    """
-
-    if dataset is None:
-        print("Did not register a dataset")
-        return
-
-    nasdaqDF = pd.DataFrame()
-    nasdaqDF['Open'] = dataset['Open']
-    nasdaqDF['Date'] = dataset['Date']
-
-    print(f"Evaluating dataset with the length {len(dataset)}")
-    print(dataset)
-    print(nasdaqDF.head())
-    plt.plot(dataset['Date'], dataset['Open'])
-    plt.xticks(range(0,len(dataset['Date']),3000))
-    plt.title("Nasdaq Composite 1971-2022")
-    plt.show()
-
 
 def kmeansclustering(stocksCSV):
     """
@@ -61,7 +32,7 @@ def kmeansclustering(stocksCSV):
 
     data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA']),np.asarray(stockDataFrame['PE'])]).T
 
-    numberOfClusters = 3
+    numberOfClusters = 4
     frameInertia = []
 
     for k in range(1, numberOfClusters+1):
@@ -98,6 +69,55 @@ def kmeansclustering(stocksCSV):
     axes.set_zlabel('PE')
 
     plt.show()
+
+
+def regression(dataset):
+    """
+    Interesting ways to implementing regression:
+    - Support Vector Machine (Should be the first on to try out)
+    - Convolutional Neural Network
+    - Recurrent Neural Network
+
+    Material for implementing:
+    - https://www.analyticsvidhya.com/blog/2020/03/support-vector-regression-tutorial-for-machine-learning/
+    - https://medium.com/pursuitnotes/support-vector-regression-in-6-steps-with-python-c4569acd062d
+    - https://www.geeksforgeeks.org/predicting-stock-price-direction-using-support-vector-machines/?ref=rp
+    - https://medium.com/@rupesh1684/stock-market-prediction-using-machine-learning-model-svm-e4aaca529886
+    """
+
+    if dataset is None:
+        print("Did not register a dataset")
+        return
+
+    nasdaqDF = pd.DataFrame()
+    nasdaqDF['Open'] = dataset['Open']
+    nasdaqDF['Date'] = dataset['Date']
+
+
+    print(f"Evaluating dataset with the length {len(dataset)}")
+    print(dataset)
+    print(nasdaqDF.head())
+    plt.plot(dataset['Date'], dataset['Open'])
+    plt.xticks(range(0,len(dataset['Date']),3000))
+    plt.title("Nasdaq Composite 1971-2022")
+    plt.show()
+
+    trainingData = nasdaqDF[-500:-100]
+
+    print("TrainingData:",trainingData)
+
+    # testData = nasdaqDF[-100:]
+
+    reshaped = np.array(trainingData['Open']).reshape((-1, 1))
+
+    # reshaped = np.reshape(trainingData['Open'], newshape=(-1, 1))
+    # print("Reshaped:",reshaped)
+
+    svrClass = SVR(kernel='rbf').fit(reshaped, trainingData['Open'])
+    print("Reshaped:",reshaped)
+    testPredict = svrClass.predict([[7957.930176]])
+    print("Done SVC",testPredict)
+
 
 if __name__ == '__main__':
     filepathNasdaq = (open('data-set/^IXIC 1971-2022.csv'))
