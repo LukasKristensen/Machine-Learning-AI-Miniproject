@@ -90,8 +90,10 @@ def regression(dataset):
         return
 
     nasdaqDF = pd.DataFrame()
-    nasdaqDF['Open'] = dataset['Open']
+    nasdaqDF['Open'] = dataset['Open'].astype(int)
     nasdaqDF['Date'] = dataset['Date']
+    nasdaqDF['Prediction'] = dataset['Open'].astype(int).shift(-10)
+    nasdaqDF = nasdaqDF[:-10]
 
 
     print(f"Evaluating dataset with the length {len(dataset)}")
@@ -102,19 +104,19 @@ def regression(dataset):
     plt.title("Nasdaq Composite 1971-2022")
     plt.show()
 
-    trainingData = nasdaqDF[-1000:-100]
-    testData = nasdaqDF[-100:]
+    trainingData = nasdaqDF[-400:-70]
+    testData = nasdaqDF[-70:-40]
 
-    xreshaped = np.array(trainingData['Open'][:-10]).reshape((-1, 1))
-    yreshaped = trainingData['Open'].shift(-10)[:-10]
+    xreshaped = np.array(trainingData['Open']).reshape(-1, 1)
+    yreshaped = np.array(trainingData['Prediction'])
 
-    xtestData = np.array(testData['Open'][:-10]).reshape((-1, 1))
-    ytestData = testData['Open'].shift(-10)[:-10]
+    xtestData = np.array(testData['Open']).reshape(-1, 1)
+    ytestData = np.array(testData['Prediction'])
 
-    plt.plot(xreshaped, yreshaped)
+    # plt.plot(xreshaped, yreshaped)
 
-    print("x_Reshaped:",xreshaped)
-    print("y_Reshaped.",yreshaped)
+    # print("x_Reshaped:",xreshaped)
+    # print("y_Reshaped:",yreshaped)
     print("Debugging ...")
 
     # Check parameters: C and gamma
