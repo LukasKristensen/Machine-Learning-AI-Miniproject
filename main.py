@@ -32,7 +32,7 @@ def kMeansClustering(stocksCSV):
 
     data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA']),np.asarray(stockDataFrame['PE'])]).T
 
-    numberOfClusters = 4
+    numberOfClusters = 3
     frameInertia = []
 
     for k in range(1, numberOfClusters+1):
