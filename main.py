@@ -90,21 +90,22 @@ def regression(dataset):
         print("Did not register a dataset")
         return
 
-    daysPredict = 1
+    daysPredict = 10
+
 
     nasdaqDF = pd.DataFrame()
     nasdaqDF['Open'] = dataset['Open'].astype(int)
-    nasdaqDF['Date'] = dataset['Date']#.shift(-daysPredict)
-    nasdaqDF['Prediction'] = dataset['Open'].astype(int).shift(-daysPredict)
+    nasdaqDF['Date'] = dataset['Date']
+    nasdaqDF['Prediction'] = dataset['Open'].shift(-daysPredict)
     nasdaqDF = nasdaqDF[:-daysPredict]
 
-    plt.plot(dataset['Date'], dataset['Open'])
-    plt.xticks(range(0,len(dataset['Date']),50))
+    plt.plot(dataset['Date'][-3000:], dataset['Open'][-3000:])
+    plt.xticks(range(0,len(dataset['Date'][-3000:]),300))
     plt.title("Nasdaq Composite 1971-2022")
     plt.show()
 
-    trainingData = nasdaqDF[0:-50]
-    testData = nasdaqDF[-50:]
+    trainingData = nasdaqDF[-3000:-1000]
+    testData = nasdaqDF[-1000:]
 
     xreshaped = np.array(trainingData['Open']).reshape(-1, 1)
     yreshaped = np.array(trainingData['Prediction'])
@@ -115,24 +116,23 @@ def regression(dataset):
     """
     Next 5 lines (Regression model) is based on the documentation from: 
     https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html"""
-    modelRegression = make_pipeline(StandardScaler(), SVR(kernel='rbf',C=200, gamma=0.02))
+    modelRegression = make_pipeline(StandardScaler(), SVR(kernel='rbf',C=2000, gamma=0.02))
     fittedRegression = modelRegression.fit(xreshaped, yreshaped)
 
     predictionRegression = fittedRegression.predict(xtestData)
-    print("TestPrint",predictionRegression)
     scoreReg = explained_variance_score(ytestData, predictionRegression)
 
     plt.plot(trainingData['Date'],trainingData['Prediction'], c="blue")
     plt.plot(testData['Date'],predictionRegression, c="red")
     plt.plot(testData['Date'],ytestData, c="green")
-    plt.xticks(range(0, len(nasdaqDF['Date']), 30))
+    plt.xticks(range(0, len(nasdaqDF['Date'][-3000:]), 300))
 
     print("Done test regression", scoreReg)
     plt.show()
 
 
 if __name__ == '__main__':
-    filepathNasdaq = (open('data-set/2014NASDAQ.csv'))
+    filepathNasdaq = (open('data-set/^IXIC 1971-2022.csv'))
     nasdaqCSV = pd.read_csv(filepathNasdaq, sep=',')
     regression(nasdaqCSV)
 
