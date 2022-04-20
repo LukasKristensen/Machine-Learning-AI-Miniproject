@@ -1,16 +1,13 @@
-from sklearn.model_selection import train_test_split
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
+from scipy.cluster.vq import kmeans, vq
 
 from sklearn.pipeline import make_pipeline
-from scipy.cluster.vq import kmeans,vq
-
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from sklearn.metrics import explained_variance_score
 
-# Todo: Comment code before hand-in
 
 def kMeansClustering(stocksCSV):
     """
@@ -34,7 +31,7 @@ def kMeansClustering(stocksCSV):
     stockDataFrame['TICKER'] = ticker
 
     # Loading the data into a numpy array
-    data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA']),np.asarray(stockDataFrame['PE'])]).T
+    data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA']), np.asarray(stockDataFrame['PE'])]).T
 
     # Defining the amount of clusters and preparing an array for the Inertia
     numberOfClusters = 3
@@ -43,22 +40,22 @@ def kMeansClustering(stocksCSV):
     for k in range(1, numberOfClusters+1):
         stockCentroids, euclidean = kmeans(data, k)
         evaluateAmountEuclidean.append(euclidean)
-        print(f'Euclidean distance with {k} clusters:',euclidean)
+        print(f'Euclidean distance with {k} clusters:', euclidean)
 
     # Plotting the iterative evaluation over the amount of clusters relative to inertia
-    plt.plot(range(1,numberOfClusters+1), evaluateAmountEuclidean)
+    plt.plot(range(1, numberOfClusters+1), evaluateAmountEuclidean)
     plt.grid(True)
     plt.show()
 
     # Loading the euclidean again. This time only the final model
-    stockCentroids,euclidean = kmeans(data, numberOfClusters)
-    print("Euclidean distance:",euclidean)
+    stockCentroids, euclidean = kmeans(data, numberOfClusters)
+    print("Euclidean distance:", euclidean)
     assignedStock, innerEuclidean = vq(data, stockCentroids)
-    print("For-each data-point - Euclidean distance to cluster:",innerEuclidean)
+    print("For-each data-point - Euclidean distance to cluster:", innerEuclidean)
 
     # Combining the assigned clusters to the rest of the dataframe and prints the result
     stockDataFrame['CLUSTER'] = assignedStock
-    print('Clustered:\n',stockDataFrame)
+    print('Clustered:\n', stockDataFrame)
 
     # Plotting the clusters into Matplotlib with the assigned stocks with color coding. Setting the projection to 3D
     fig3d = plt.figure(figsize=(9,7))
@@ -103,7 +100,7 @@ def regression(dataset):
 
     # Viewing the data-set
     plt.plot(dataset['Date'][datasetInterval:], dataset['Open'][datasetInterval:])
-    plt.xticks(range(0,len(dataset['Date'][datasetInterval:]),300))
+    plt.xticks(range(0, len(dataset['Date'][datasetInterval:]), 300))
     plt.title("Nasdaq Composite 1971-2022")
     plt.show()
 
@@ -129,9 +126,9 @@ def regression(dataset):
     scoreReg = explained_variance_score(yTestData, predictionRegression)
 
     # Visualizing the prediction compared to the true data, combined with historical trained data
-    plt.plot(trainingData['Date'],trainingData['Prediction'], c="blue")
-    plt.plot(testData['Date'],predictionRegression, c="red")
-    plt.plot(testData['Date'],yTestData, c="green")
+    plt.plot(trainingData['Date'], trainingData['Prediction'], c="blue")
+    plt.plot(testData['Date'], predictionRegression, c="red")
+    plt.plot(testData['Date'], yTestData, c="green")
     plt.xticks(range(0, len(nasdaqDF['Date'][datasetInterval:]), 300))
 
     # Evaluating the model
