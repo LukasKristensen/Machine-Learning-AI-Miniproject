@@ -19,44 +19,48 @@ def kMeansClustering(stocksCSV):
     """
 
     # Todo: Normalize features to fit -1 to 1
+
+    # Defining the features
     ticker = stocksCSV['Ticker']
     Y5AVG = stocksCSV['5YAvgReturn']
     BETA = stocksCSV['Beta']
     PE = stocksCSV['PE']
 
+    # Loading the data into a pandas DataFrame
     stockDataFrame = pd.DataFrame()
     stockDataFrame['Y5AVG'] = Y5AVG
     stockDataFrame['BETA'] = BETA
     stockDataFrame['PE'] = PE
     stockDataFrame['TICKER'] = ticker
 
+    # Loading the data into a numpy array
     data = np.asarray([np.asarray(stockDataFrame['Y5AVG']), np.asarray(stockDataFrame['BETA']),np.asarray(stockDataFrame['PE'])]).T
 
+    # Defining the amount of clusters and preparing an array for the Inertia
     numberOfClusters = 3
-    frameInertia = []
+    evaluateAmountEuclidean = []
 
     for k in range(1, numberOfClusters+1):
-        stockCentroids, inertia = kmeans(data, k)
-        frameInertia.append(inertia)
-        print(f'Euclidean distance with {k} clusters:',inertia)
+        stockCentroids, euclidean = kmeans(data, k)
+        evaluateAmountEuclidean.append(euclidean)
+        print(f'Euclidean distance with {k} clusters:',euclidean)
 
-    plt.plot(range(1,numberOfClusters+1), frameInertia)
+    # Plotting the iterative evaluation over the amount of clusters relative to inertia
+    plt.plot(range(1,numberOfClusters+1), evaluateAmountEuclidean)
     plt.grid(True)
     plt.show()
 
+    # Loading the euclidean again. This time only the final model
     stockCentroids,euclidean = kmeans(data, numberOfClusters)
     print("Euclidean distance:",euclidean)
     assignedStock, innerEuclidean = vq(data, stockCentroids)
     print("For-each data-point - Euclidean distance to cluster:",innerEuclidean)
 
-    for i in range(len(assignedStock)):
-        print(assignedStock[i], ticker[i])
-
-    print("View:", "\n", stockDataFrame, assignedStock)
-
+    # Combining the assigned clusters to the rest of the dataframe and prints the result
     stockDataFrame['CLUSTER'] = assignedStock
     print('Clustered:\n',stockDataFrame)
 
+    # Plotting the clusters into Matplotlib with the assigned stocks with color coding. Setting the projection to 3D
     fig3d = plt.figure(figsize=(9,7))
     axes = fig3d.add_subplot(111, projection='3d')
     axes.scatter(data[assignedStock==0,0], data[assignedStock==0,1],data[assignedStock==0,2], s=20, c='blue',label="Cluster 0")
@@ -64,6 +68,8 @@ def kMeansClustering(stocksCSV):
     axes.scatter(data[assignedStock==2,0], data[assignedStock==2,1],data[assignedStock==2,2], s=20, c='red',label="Cluster 2")
     axes.scatter(data[assignedStock==3,0], data[assignedStock==3,1],data[assignedStock==3,2], s=20, c='purple',label="Cluster 3")
     axes.scatter(stockCentroids[:,0], stockCentroids[:,1], stockCentroids[:,2], s=80, c='black', alpha=0.3,label= "Centroids")
+
+    # Defining the features relative to the axis on the plot
     axes.set_xlabel('AvgAnnualReturn(5Y)')
     axes.set_ylabel('Beta')
     axes.set_zlabel('PE')
@@ -84,52 +90,62 @@ def regression(dataset):
         print("Did not register a dataset")
         return
 
+    # Data-set parameters
     daysPredict = 10
     datasetInterval = -3000
 
+    # Loading the data-set into a pandas DataFrame
     nasdaqDF = pd.DataFrame()
     nasdaqDF['Open'] = dataset['Open'].astype(int)
     nasdaqDF['Date'] = dataset['Date']
     nasdaqDF['Prediction'] = dataset['Open'].shift(-daysPredict)
     nasdaqDF = nasdaqDF[:-daysPredict]
 
+    # Viewing the data-set
     plt.plot(dataset['Date'][datasetInterval:], dataset['Open'][datasetInterval:])
     plt.xticks(range(0,len(dataset['Date'][datasetInterval:]),300))
     plt.title("Nasdaq Composite 1971-2022")
     plt.show()
 
+    # Splitting the data-set into training data and test data
     trainingData = nasdaqDF[datasetInterval:-1000]
     testData = nasdaqDF[-1000:]
 
+    # Normalizing features
     xReshaped = np.array(trainingData['Open']).reshape(-1, 1)
-    yReshaped = np.array(trainingData['Prediction'])
-
+    yReshaped = np.array(trainingData['Prediction']).reshape(-1, 1).flatten()
     xTestData = np.array(testData['Open']).reshape(-1, 1)
-    yTestData = np.array(testData['Prediction'])
+    yTestData = np.array(testData['Prediction']).reshape(-1, 1).flatten()
 
+    # Setting up and fitting the model
     """
     Next 6 lines (SVR-Model) is based on the documentation from: 
     https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html"""
     modelRegression = make_pipeline(StandardScaler(), SVR(kernel='rbf', C=2000, gamma=0.01))
     fittedRegression = modelRegression.fit(xReshaped, yReshaped)
 
+    # Predicting the test-data
     predictionRegression = fittedRegression.predict(xTestData)
     scoreReg = explained_variance_score(yTestData, predictionRegression)
 
+    # Visualizing the prediction compared to the true data, combined with historical trained data
     plt.plot(trainingData['Date'],trainingData['Prediction'], c="blue")
     plt.plot(testData['Date'],predictionRegression, c="red")
     plt.plot(testData['Date'],yTestData, c="green")
     plt.xticks(range(0, len(nasdaqDF['Date'][datasetInterval:]), 300))
 
+    # Evaluating the model
     print("Variance score for regression:", scoreReg)
     plt.show()
 
 
 if __name__ == '__main__':
+    # Regression Model
     filepathNasdaq = (open('data-set/^IXIC 1971-2022.csv'))
     nasdaqCSV = pd.read_csv(filepathNasdaq, sep=',')
     regression(nasdaqCSV)
 
+    # Clustering Model
     filepathStocks = (open('data-set/testDataV3.csv'))
     stocksToCSV = pd.read_csv(filepathStocks, sep=';')
     kMeansClustering(stocksToCSV)
