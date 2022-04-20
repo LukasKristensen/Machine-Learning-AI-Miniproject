@@ -3,11 +3,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 
+from sklearn.pipeline import make_pipeline
 from scipy.cluster.vq import kmeans,vq
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import explained_variance_score
 
 # Todo: Comment code before hand-in
 
@@ -89,23 +90,21 @@ def regression(dataset):
         print("Did not register a dataset")
         return
 
+    daysPredict = 1
+
     nasdaqDF = pd.DataFrame()
     nasdaqDF['Open'] = dataset['Open'].astype(int)
-    nasdaqDF['Date'] = dataset['Date']
-    nasdaqDF['Prediction'] = dataset['Open'].astype(int).shift(-10)
-    nasdaqDF = nasdaqDF[:-10]
+    nasdaqDF['Date'] = dataset['Date']#.shift(-daysPredict)
+    nasdaqDF['Prediction'] = dataset['Open'].astype(int).shift(-daysPredict)
+    nasdaqDF = nasdaqDF[:-daysPredict]
 
-
-    print(f"Evaluating dataset with the length {len(dataset)}")
-    print(dataset)
-    print(nasdaqDF.head())
     plt.plot(dataset['Date'], dataset['Open'])
-    plt.xticks(range(0,len(dataset['Date']),3000))
+    plt.xticks(range(0,len(dataset['Date']),50))
     plt.title("Nasdaq Composite 1971-2022")
     plt.show()
 
-    trainingData = nasdaqDF[-400:-70]
-    testData = nasdaqDF[-70:-40]
+    trainingData = nasdaqDF[0:-50]
+    testData = nasdaqDF[-50:]
 
     xreshaped = np.array(trainingData['Open']).reshape(-1, 1)
     yreshaped = np.array(trainingData['Prediction'])
@@ -113,23 +112,28 @@ def regression(dataset):
     xtestData = np.array(testData['Open']).reshape(-1, 1)
     ytestData = np.array(testData['Prediction'])
 
-    # plt.plot(xreshaped, yreshaped)
+    """
+    Next 5 lines (Regression model) is based on the documentation from: 
+    https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html"""
+    modelRegression = make_pipeline(StandardScaler(), SVR(kernel='rbf',C=200, gamma=0.02))
+    fittedRegression = modelRegression.fit(xreshaped, yreshaped)
 
-    # print("x_Reshaped:",xreshaped)
-    # print("y_Reshaped:",yreshaped)
-    print("Debugging ...")
+    predictionRegression = fittedRegression.predict(xtestData)
+    print("TestPrint",predictionRegression)
+    scoreReg = explained_variance_score(ytestData, predictionRegression)
 
-    # Check parameters: C and gamma
-    svrClass = SVR(kernel='rbf').fit(xreshaped, yreshaped)
-    testPredict = svrClass.predict([[13200]])
-    print("Done SVC",testPredict)
-    print("Score: ",svrClass.score(xtestData,ytestData))
+    plt.plot(trainingData['Date'],trainingData['Prediction'], c="blue")
+    plt.plot(testData['Date'],predictionRegression, c="red")
+    plt.plot(testData['Date'],ytestData, c="green")
+    plt.xticks(range(0, len(nasdaqDF['Date']), 30))
+
+    print("Done test regression", scoreReg)
     plt.show()
 
 
 if __name__ == '__main__':
-    filepathNasdaq = (open('data-set/^IXIC 1971-2022.csv'))
-    nasdaqCSV = pd.read_csv(filepathNasdaq)
+    filepathNasdaq = (open('data-set/2014NASDAQ.csv'))
+    nasdaqCSV = pd.read_csv(filepathNasdaq, sep=',')
     regression(nasdaqCSV)
 
     filepathStocks = (open('data-set/testDataV3.csv'))
