@@ -117,7 +117,7 @@ def regression(dataset):
     """
     Next 6 lines (SVR-Model) is based on the documentation from: 
     https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html"""
-    modelRegression = make_pipeline(StandardScaler(), SVR(kernel='rbf', C=2000, gamma=0.01))
+    modelRegression = make_pipeline(StandardScaler(), SVR(kernel='rbf', C=2000, gamma=0.001))
     fittedRegression = modelRegression.fit(xReshaped, yReshaped)
 
     # Predicting the test-data
@@ -125,8 +125,8 @@ def regression(dataset):
     scoreReg = explained_variance_score(yTestData, predictionRegression)
 
     # Visualizing the prediction compared to the true data, combined with historical trained data
-    plt.plot(predictionRegression, c="red")
-    plt.plot(yTestData, c="green")
+    plt.plot(predictionRegression[20:], c="red")
+    plt.plot(yTestData[:-20], c="green")
 
     # Evaluating the model
     print("Evaluating SVR:")
