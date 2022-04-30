@@ -98,14 +98,14 @@ def regression(dataset):
     nasdaqDF = nasdaqDF[:-daysPredict]
 
     # Viewing the data-set
-    plt.plot(dataset['Date'][len(dataset)-3000:], dataset['Open'][-3000:])
-    plt.xticks(range(0, len(dataset['Date'][-3000:]), 300))
+    plt.plot(dataset['Date'], dataset['Open'])
+    plt.xticks(range(0, len(dataset['Date']), 3000))
     plt.title("Nasdaq Composite 1971-2022")
     plt.show()
 
     # Splitting the data-set into training data and test data
-    trainingData = nasdaqDF[-3000:-600]
-    testData = nasdaqDF[-600:]
+    trainingData = nasdaqDF[:-3000]
+    testData = nasdaqDF[-3000:]
 
     # Normalizing features
     xReshaped = np.array(trainingData['Open']).reshape(-1, 1)
@@ -125,8 +125,9 @@ def regression(dataset):
     scoreReg = explained_variance_score(yTestData, predictionRegression)
 
     # Visualizing the prediction compared to the true data, combined with historical trained data
-    plt.plot(predictionRegression[20:], c="red")
-    plt.plot(yTestData[:-20], c="green")
+    plt.plot(dataset['Date'][-2980:], predictionRegression[daysPredict:], c="red")
+    plt.plot(yTestData[:-daysPredict], c="green")
+    plt.xticks(range(0, 3000, 300))
 
     # Evaluating the model
     print("Evaluating SVR:")
