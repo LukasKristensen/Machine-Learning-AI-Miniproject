@@ -9,13 +9,13 @@ from sklearn.svm import SVR
 from sklearn.metrics import explained_variance_score
 from sklearn.metrics import mean_absolute_error
 
+
 def kMeansClustering(stocksCSV):
+
     """
     The clustering code structure is based on the code from:
     https://pythonforfinance.net/2018/02/08/stock-clusters-using-k-means-algorithm-in-python/
     """
-
-    # Todo: Normalize features to fit -1 to 1
 
     # Defining the features
     ticker = stocksCSV['Ticker']
