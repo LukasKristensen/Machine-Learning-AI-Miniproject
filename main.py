@@ -7,7 +7,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from sklearn.metrics import explained_variance_score
-
+from sklearn.metrics import mean_absolute_error
 
 def kMeansClustering(stocksCSV):
     """
@@ -75,14 +75,6 @@ def kMeansClustering(stocksCSV):
 
 
 def regression(dataset):
-    """"
-    Material for implementing:
-    - https://www.analyticsvidhya.com/blog/2020/03/support-vector-regression-tutorial-for-machine-learning/
-    - https://medium.com/pursuitnotes/support-vector-regression-in-6-steps-with-python-c4569acd062d
-    - https://www.geeksforgeeks.org/predicting-stock-price-direction-using-support-vector-machines/?ref=rp
-    - https://medium.com/@rupesh1684/stock-market-prediction-using-machine-learning-model-svm-e4aaca529886
-    """
-
     if dataset is None:
         print("Did not register a dataset")
         return
@@ -104,14 +96,15 @@ def regression(dataset):
     plt.show()
 
     # Splitting the data-set into training data and test data
-    trainingData = nasdaqDF[:-3000]
-    testData = nasdaqDF[-3000:]
+    trainingData = nasdaqDF[:-2000]
+    validationData = nasdaqDF[-4000:-2000]
+    testData = nasdaqDF[-2000:]
 
     # Normalizing features
     xReshaped = np.array(trainingData['Open']).reshape(-1, 1)
     yReshaped = np.array(trainingData['Prediction']).reshape(-1, 1).flatten()
     xTestData = np.array(testData['Open']).reshape(-1, 1)
-    yTestData = np.array(testData['Prediction']).reshape(-1, 1).flatten()
+    yTestData = np.array(testData['Prediction']).reshape(-1, 1)
 
     # Setting up and fitting the model
     """
@@ -122,16 +115,19 @@ def regression(dataset):
 
     # Predicting the test-data
     predictionRegression = fittedRegression.predict(xTestData)
-    scoreReg = explained_variance_score(yTestData, predictionRegression)
-
-    # Visualizing the prediction compared to the true data, combined with historical trained data
-    plt.plot(dataset['Date'][-2980:], predictionRegression[daysPredict:], c="red")
-    plt.plot(yTestData[:-daysPredict], c="green")
-    plt.xticks(range(0, 3000, 300))
 
     # Evaluating the model
-    print("Evaluating SVR:")
-    print(f'Variance Score: {scoreReg}')
+    scoreReg = explained_variance_score(yTestData.flatten(), predictionRegression)
+    meanError = mean_absolute_error(yTestData.flatten(), predictionRegression)
+    score = modelRegression.score(xTestData,yTestData)
+    print("Variance Score:",scoreReg)
+    print("Mean Error:",meanError)
+    print("R2 Score:",score)
+
+    # Visualizing the prediction compared to the true data, combined with historical trained data
+    plt.plot(dataset['Date'][-1980:], predictionRegression[daysPredict:], c="red")
+    plt.plot(yTestData[:-daysPredict], c="green")
+    plt.xticks(range(0, 2000, 300))
     plt.show()
 
 
