@@ -125,6 +125,7 @@ def regression(dataset):
     print("R2 Score:",score)
 
     # Visualizing the prediction compared to the true data, combined with historical trained data
+    plt.figure(figsize=(10,7))
     plt.plot(dataset['Date'][-1980:], predictionRegression[daysPredict:], c="red")
     plt.plot(yTestData[:-daysPredict], c="green")
     plt.xticks(range(0, 2000, 300))
@@ -132,12 +133,12 @@ def regression(dataset):
 
 
 if __name__ == '__main__':
-    # Regression Model
-    filepathNasdaq = (open('data-set/^IXIC 1971-2022.csv'))
-    nasdaqCSV = pd.read_csv(filepathNasdaq, sep=',')
-    regression(nasdaqCSV)
-
     # Clustering Model
     filepathStocks = (open('data-set/testDataV3.csv'))
     stocksToCSV = pd.read_csv(filepathStocks, sep=';')
     kMeansClustering(stocksToCSV)
+
+    # Regression Model
+    filepathNasdaq = (open('data-set/^IXIC 1971-2022.csv'))
+    nasdaqCSV = pd.read_csv(filepathNasdaq, sep=',')
+    regression(nasdaqCSV)
